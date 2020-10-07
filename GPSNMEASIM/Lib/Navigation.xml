@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <doclet-version-NOT-library-version>1.02</doclet-version-NOT-library-version>
+    <class>
+        <name>derez.libs.Navigation</name>
+        <shortname>Navigation</shortname>
+        <comment>The library provide several methods which can be used 
+ for navigation calculations.</comment>
+        <owner>process</owner>
+        <method>
+            <name>FlatArea2</name>
+            <comment>The methods calculates the area enclosed inside a polygon.
+ n is the polygon's size.
+ UindxX and UindxY are the indices of the parameters UTMx and UTMy in the array.
+ The returned area is in square Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>Poligon</name>
+                <type>double[][]</type>
+            </parameter>
+            <parameter>
+                <name>n</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>UindxX</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>UindxY</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UTMRouteLength2</name>
+            <comment>For an array of UTM points, the method calculates 
+ the length of a route which starts at point "start" and ends at "last".
+ UindxX and UindxY are the indices of the parameters UTMx and UTMy in the array.
+ The result is in Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>Poligon</name>
+                <type>double[][]</type>
+            </parameter>
+            <parameter>
+                <name>start</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>last</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>UindxX</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>UindxY</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UTMNextPoint</name>
+            <comment>Calculates the UTM coordinates of the point defined by Distance in Km and Bearing in degrees,
+ from point 1.
+ The calculation is done as if the area is flat.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>x1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>y1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Distance</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Bearing</name>
+                <type>double</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UTMToLatLon</name>
+            <comment>This function converts the specified UTM coordinate to a lat/lon 
+  coordinate.
+  - utmXZone must be between 1 and 60, inclusive.
+  - utmYZone must be one of: CDEFGHJKLMNPQRSTUVWX
+  Parameters:
+  	double a:  Ellipsoid semi-major axis, in meters. 
+       (For WGS84 datum, use 6378137.0)
+     double f:  Ellipsoid flattening. (For WGS84 datum, use 1 / 298.257223563)
+     int utmXZone: The horizontal zone number of the UTM coordinate.
+     char utmYZone:  The vertical zone letter of the UTM coordinate.
+     double easting, double northing: The UTM coordinate to convert.
+     double lat:  Upon exit, lat contains the latitude.
+     double lon:  Upon exit, lon contains the longitude.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>a</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>f</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>UtmXZone</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>Easting</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>NorthHemisphere</name>
+                <type>boolean</type>
+            </parameter>
+            <parameter>
+                <name>Northing</name>
+                <type>double</type>
+            </parameter>
+        </method>
+        <method>
+            <name>FlatArea</name>
+            <comment>The methods calculates the area enclosed inside a polygon which is defined in the list parameter.
+ Every list item should be a string of the form "UTMX,UTMY".
+ The returned area is in square Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>UTMlist</name>
+                <type>java.util.List</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SphericalArea2</name>
+            <comment>The methods calculates the area on the Earth's spherical enclosed inside a polygon.
+ n is the polygon's size.
+ GindxLat and GindxLong are the indices of the parameters Lat and Long in the array.
+ The returned area is in square Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>Poligon</name>
+                <type>double[][]</type>
+            </parameter>
+            <parameter>
+                <name>n</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>GindxLat</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>GindxLong</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UTMDistanceBearing</name>
+            <comment>Calculates the Distance in Km and Bearing in degrees,
+ from point 1 to 2.
+ The calculation is done as if the area is flat.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>x1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>y1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>x2</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>y2</name>
+                <type>double</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GeoRouteLength</name>
+            <comment>For a list of GEO points, the method calculates 
+ the length of the total route in Km.
+ Every list item should be a string of the form "Lat,Long".</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>GEOlist</name>
+                <type>java.util.List</type>
+            </parameter>
+        </method>
+        <method>
+            <name>LatLonToUTM</name>
+            <comment>This function converts the specified lat/lon coordinate to a UTM coordinate.
+  Parameters:
+    double a: Ellipsoid semi-major axis, in meters. 
+        (For WGS84 datum, use 6378137.0)
+    double f: Ellipsoid flattening. 
+        (For WGS84 datum, use 1 / 298.257223563).
+    int utmXZone:
+    		 Upon exit, this parameter will contain the hotizontal
+    		 zone number of the UTM coordinate. 
+           The returned value for this parameter is a number
+           within the range 1 to 60, inclusive.
+   char utmYZone: Upon exit, this parameter will contain
+   the zone letter of the UTM coordinate.  
+   The returned value for this parameter will be one of:
+           CDEFGHJKLMNPQRSTUVWX.
+   double easting: Upon exit, this parameter will contain 
+           the UTM easting, in meters.
+   double northing: Upon exit, this parameter will contain 
+   	     the UTM northing, in meters.
+   double lat, double lon: The lat/lon coordinate to convert.
+   The returned double array is in this order:
+   easting, northing ,utmXZone, utmYzone.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>a</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>f</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Lat</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Lon</name>
+                <type>double</type>
+            </parameter>
+        </method>
+        <method>
+            <name>UTMRouteLength</name>
+            <comment>For a list of UTM points, the method calculates 
+ the length of the total route in Km.
+ Every list item should be a string of the form "UTMX,UTMY".</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>UTMlist</name>
+                <type>java.util.List</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GeoDistanceBearing</name>
+            <comment>Calculates the Distance in Km and Bearing in degrees, from point 1 to 2.
+ The calculated "straight line" is a Great Arc which is the shortest on a sphere.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>Lat1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Long1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Lat2</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Long2</name>
+                <type>double</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GeoRouteLength2</name>
+            <comment>For an array of GEO points, the method calculates 
+ the length of a route which starts at point "start" and ends at "last".
+ GindxLat and GindxLong are the indices of the parameters Lat and Long in the array.
+ The result is in Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>Poligon</name>
+                <type>double[][]</type>
+            </parameter>
+            <parameter>
+                <name>start</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>last</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>GindxLat</name>
+                <type>int</type>
+            </parameter>
+            <parameter>
+                <name>GindxLong</name>
+                <type>int</type>
+            </parameter>
+        </method>
+        <method>
+            <name>SphericalArea</name>
+            <comment>The methods calculates the area on the Earth's spherical enclosed inside a polygon
+ which is defined in the list parameter.
+ Every list item should be a string of the form "Lat,Long".
+ The returned area is in square Km.</comment>
+            <returntype>double</returntype>
+            <parameter>
+                <name>GEOlist</name>
+                <type>java.util.List</type>
+            </parameter>
+        </method>
+        <method>
+            <name>GeoNextPoint</name>
+            <comment>Calculates the Lat and Long coordinates of a point by the Distance in km and Bearing in degrees from a known point.
+ Based on Great Arc calculation.</comment>
+            <returntype>double[]</returntype>
+            <parameter>
+                <name>Lat1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Long1</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Distance</name>
+                <type>double</type>
+            </parameter>
+            <parameter>
+                <name>Bearing</name>
+                <type>double</type>
+            </parameter>
+        </method>
+    </class>
+    <version>1.1</version>
+    <author>Derez</author>
+</root>

@@ -1,0 +1,1064 @@
+﻿Build1=Default,gpssim.hobby4life.nl
+File1=connect.png
+File10=InitScreen.bal
+File11=lighthouse.png
+File12=Page1.bal
+File13=Page2.bal
+File14=Page3.bal
+File15=page4.bal
+File16=reset.mp3
+File17=saticon3.png
+File18=search.png
+File19=startstream.mp3
+File2=connected.mp3
+File20=stopstream.mp3
+File21=warning.png
+File22=welcome.mp3
+File3=disconnect.png
+File4=disconnected.mp3
+File5=exit2.png
+File6=gpsdroid_mid.png
+File7=gpsdroid_small.png
+File8=indicator.png
+File9=indicator_b.png
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
+FileGroup12=Default Group
+FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=Default Group
+FileGroup19=Default Group
+FileGroup2=Default Group
+FileGroup20=Default Group
+FileGroup21=Default Group
+FileGroup22=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+IconFile=
+Library1=core
+Library2=phone
+Library3=serial
+Library4=navigation
+Library5=tabstripviewpager
+Library6=runtimepermissions
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.basic4ppc.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="26"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'End of default text.~\n~'********* TabStrip ***********************~\n~CreateResource(drawable, background_tab.xml,~\n~<selector xmlns:android="http://schemas.android.com/apk/res/android"~\n~   android:exitFadeDuration="@android:integer/config_shortAnimTime">~\n~  <item android:state_pressed="true" android:drawable="@color/background_tab_pressed" />~\n~  <item android:state_focused="true" android:drawable="@color/background_tab_pressed"/>~\n~  <item android:drawable="@android:color/transparent"/>~\n~</selector>)~\n~CreateResource(values, colors.xml,~\n~<resources>~\n~  <color name="background_tab_pressed">#6633B5E5</color>~\n~</resources>)~\n~'******************************************
+NumberOfFiles=22
+NumberOfLibraries=6
+NumberOfModules=0
+Version=9.5
+@EndOfDesignText@
+#Region Module Attributes
+	#FullScreen: true
+	#IncludeTitle: true
+	#ApplicationLabel: GPS NMEA Simulator
+	#VersionCode: 302
+	#VersionName: 
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: True
+	#AdditionalJar: com.android.support:support-v4
+#End Region
+
+
+'======================================================================================
+'*	Application name	: GPS NMEA Simulator
+'*	Developed by		: Björn Pasteuning
+'*	Description			: Generates $GPRMC and $GPGGA Nnmea sentences 
+
+'Activity module
+Sub Process_Globals
+	Private Version As Int : Version = 302
+	
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Dim app_label As String: app_label = "GPS NMEA Simulator"
+	Dim app_ver As String: app_ver = "Version " & (Version / 100)
+	Dim app_author As String: app_author = "Hobby4life, The Netherlands."
+	Dim app_email As String: app_email = "hobby4lifenl@gmail.com"
+	Dim app_website As String: app_website = "https://www.hobby4life.nl"
+	Dim Admin As BluetoothAdmin
+	Dim FoundDevices As List
+	Type NameAndMac (Name As String, Mac As String)
+	Dim connectedDevice As NameAndMac
+	Dim Serial1 As Serial
+	Dim Timer1 As Timer 'represents a 500 millisecond timer
+	Dim Timer2 As Timer 'represents a 100 millisecond timer
+	Dim Timer3 As Timer 'represents a 1 Second timer
+	Dim Connected As Boolean : Connected = False
+	Dim Streaming As Boolean : Streaming = False
+	Dim Imperial As Boolean : Imperial = False
+	Dim Nav As Navigation
+	Private RP As RuntimePermissions
+	'-------------------- Save file voor alle inhoud van de slots ------------------------
+	Private FileINI As String : FileINI = "GPSSIM.cfg"
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	'These variables can only be accessed from this module.
+
+
+'--------------------PAGE 1-----------------------------
+	Dim Interval_Spin As Spinner
+	Dim Unit_Spin As Spinner
+	'Dim NMEAMon_Label As Label
+	Dim Exit_Button As Button
+	Dim Info_Button As Button
+	Dim Connect_Button As Button
+	Dim Disconnect_Button As Button
+	Dim Search_Button As Button
+	Dim Discover_Button As Button : Dim Stop As Button	
+	Dim Reset_LatLong_Button As Button
+	Dim Start As Button
+	Dim Status As Label
+'--------------------PAGE 2-----------------------------
+	Dim NS_Spin As Spinner
+	Dim EW_Spin As Spinner
+	Dim SatFix_Spin As Spinner
+	Dim Lattitude_Input As EditText : Dim Lattitude As Double : Dim NMEA_Lat As String
+	Dim Lattitude_hems As String : Lattitude_hems = "N"
+	Dim Longitude_Input As EditText : Dim Longitude As Double : Dim NMEA_Lon As String
+	Dim Longitude_hems As String : Longitude_hems = "E"
+'--------------------PAGE 3-----------------------------
+	Dim Bearing_Bar As SeekBar : Dim Speed_Bar As SeekBar : Dim Altitude_Bar As SeekBar : Dim Sattelite_Bar As SeekBar : Dim WindDirection_Bar As SeekBar
+	Dim Circle_Text As Label : Dim Circle_Value As Double : Dim Circle_Check As ToggleButton : Dim CircleInc_Button As Button : Dim CircleDecr_Button As Button
+	Dim Altitude_Text As Label : Dim Altitude_value As Double : Dim Altitude_Check As ToggleButton : Dim AltitudeInc_Button As Button : Dim AltitudeDecr_Button As Button
+	Dim WindSpeed_Text As Label : Dim WindSpeed_Value As Int : Dim Wind_Check As ToggleButton : Dim WindSpeedInc_Button As Button : Dim WindSpeedDecr_Button As Button
+	Dim Altitude_Input As Label : Dim Altitude_value As Double : Dim Altitude As Int : Dim NMEA_Alt As String
+	Dim Bearing_Input As Label : Dim Bearing As Int : Dim NMEA_Bearing As String
+	Dim Speed_Input As Label : Dim Speed As Int : Dim NMEA_Speed As String
+	Dim WindDirection_Input As Label
+	
+	Dim SatView_Input As Label
+'--------------------GLOBAL-----------------------------
+	Private TabStrip1 As TabStrip
+	Dim GPRMC As String : Dim GPGGA As String
+	Dim PWS As PhoneWakeState
+	Dim Welcome_snd As MediaPlayer
+	Dim StopStream_snd As MediaPlayer : Dim StartStream_snd As MediaPlayer : Dim Connected_snd As MediaPlayer : Dim Disconnected_snd As MediaPlayer : Dim Reset_snd As MediaPlayer
+	
+	
+	'Dim bmp_small,bmp_mid, bmp_exit, bmp_warning As Bitmap
+	Dim bmp_small,bmp_mid, bmp_big, bmp_connect, bmp_disconnect, bmp_exit, bmp_search, bmp_discover , bmp_warning As Bitmap
+	Dim Indicator As ImageView
+	Dim Connect_image As ImageView : Dim Disconnect_Image As ImageView : Dim Indicator As ImageView
+	Dim Now As Long
+	DateTime.DateFormat = "ddMMyyHHmmss"
+	Dim Message As String
+	Dim Result As Int
+	Dim Interval As Int
+	Dim Speed_Interval As Int
+	'Dim Update As Boolean
+	Dim TextWriter1 As TextWriter
+	Dim NMEA_SatView As String
+	Dim NMEA_SatFix As Byte
+	Dim Distance As Double
+	'Dim NMEA_Output_Lines As Int = 0
+	
+	Dim Default_Lattitude As Double = 52.732386 '52.623068
+	Dim Default_Longitude As Double = 5.275058 '4.953035
+
+	Private Interval_Spin_Lbl As Label
+	Private Unit_Spin_Lbl As Label
+	Private Lattitude_Input_Lbl As Label
+	Private NS_Spin_Lbl As Label
+	Private Longitude_Input_Lbl As Label
+	Private EW_Spin_Lbl As Label
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+
+	Activity.LoadLayout("InitScreen")
+	TabStrip1.LoadLayout("Page1","Connect")						' Adds Page1 on the first Tab
+	TabStrip1.LoadLayout("Page2","Input 1")						' Adds Page2 on the second Tab
+	TabStrip1.LoadLayout("Page3","Input 2")						' Adds Page3 on the third Tab
+	TabStrip1.LoadLayout("Page4","Input 3")
+	
+	Activity.Title = "GPS NMEA Simulator, " & app_ver
+	bmp_mid.Initialize(File.DirAssets,"saticon3.png")
+	bmp_small.Initialize(File.DirAssets,"gpsdroid_small.png")
+	bmp_exit.Initialize(File.DirAssets,"exit2.png")
+	bmp_warning.Initialize(File.DirAssets,"warning.png")
+	
+	Activity.AddMenuItem2("About","MenuAbout",bmp_mid)
+	Activity.AddMenuItem2("Exit","MenuExit",bmp_exit)
+	
+	NS_Spin.AddAll(Array As String("North", "South"))
+	EW_Spin.AddAll(Array As String("East","West"))
+	Unit_Spin.AddAll(Array As String("Metric","Imperial"))
+	Interval_Spin.AddAll(Array As String("100mS (10Hz)","250mS (4Hz)","500mS (2Hz)","1000mS (1Hz)"))
+	SatFix_Spin.AddAll(Array As String("No Fix","2D GPS FIX","3D DGPS FIX"))
+	
+	Lattitude_Input.Text = Default_Lattitude
+	Longitude_Input.Text = Default_Longitude
+	
+	StartStream_snd.Initialize
+	StopStream_snd.initialize
+	Welcome_snd.Initialize
+	Connected_snd.Initialize
+	Disconnected_snd.Initialize
+	Reset_snd.Initialize
+	Welcome_snd.Load(File.DirAssets, "welcome.mp3")
+	Connected_snd.Load(File.DirAssets, "connected.mp3")
+	Disconnected_snd.Load(File.DirAssets, "disconnected.mp3")
+	StopStream_snd.Load(File.DirAssets, "stopstream.mp3")
+	StartStream_snd.Load(File.DirAssets, "startstream.mp3")
+	Reset_snd.Load(File.DirAssets, "reset.mp3")
+	Speed = Speed_Bar.Value
+	Bearing = Bearing_Bar.Value
+	Altitude = Altitude_Bar.Value
+	Status_update
+	Indicator.Visible = False
+	Start.Enabled = False
+	Stop.enabled = False
+	Disable_Items
+	Streaming = False
+	Connected = False
+	'Interval = 500 : 	Speed_Interval = 7200 : 	Interval_Spin.SelectedIndex = 2
+	SatFix_Spin.SelectedIndex = 2
+	WindDirection_Bar.Enabled = False
+
+	LoadINI
+	
+	Unit_Update(False)
+	
+	
+	If FirstTime Then
+		Admin.Initialize("admin")
+		Serial1.Initialize("serial1")
+		Status.Text = "Waiting for incoming connection"
+		Timer1.Initialize("Timer1", Interval)
+		Timer2.Initialize("Timer2", 100)
+		Timer3.Initialize("Timer3", 1000)
+		Timer3.Enabled = True
+		Welcome_snd.Play
+ 	End If
+	
+End Sub
+
+Sub Activity_Resume
+	If Admin.IsEnabled = False Then
+		If Admin.Enable = False Then 
+			ToastMessageShow("Error enabling Bluetooth adapter.", True)
+		Else
+			ToastMessageShow("Enabling Bluetooth adapter...", False)
+			'the StateChanged event will be soon raised
+		End If
+	Else
+		'Admin_StateChanged(Admin.STATE_ON, 0)
+	End If
+	LoadINI
+End Sub
+
+
+
+
+
+Sub LoadINI
+	Dim List1 As List
+	Dim VersionCompare As Int
+
+
+
+	If File.Exists(File.DirRootExternal,FileINI) Then
+		
+		RP.CheckAndRequest(RP.PERMISSION_READ_EXTERNAL_STORAGE)
+		wait for Activity_PermissionResult(Permission As String, Results As Boolean)
+		If Results Then
+			List1 = File.ReadList(File.DirRootExternal,FileINI)
+		Else
+	
+		End If
+		
+	
+		VersionCompare = List1.Get(0)
+		
+		If VersionCompare < Version Then
+			SaveINI
+			Return
+		End If
+		Lattitude_Input.Text = List1.Get(1)
+		Longitude_Input.Text = List1.Get(2)
+		NS_Spin.SelectedIndex = List1.Get(3)
+		EW_Spin.SelectedIndex = List1.Get(4)
+		Interval_Spin.SelectedIndex = List1.Get(5)
+		Unit_Spin.SelectedIndex = List1.Get(6)
+		
+		If Unit_Spin.SelectedIndex = 0 Then
+			Unit_Update(False)
+		else if Unit_Spin.SelectedIndex = 1 Then
+			Unit_Update(True)
+		End If
+		
+		Set_Interval
+		
+	Else
+		SaveINI
+	End If
+End Sub
+
+
+
+
+Sub SaveINI
+	Dim List1 As List
+
+	List1.Initialize
+	
+	List1.Add(Version)
+	List1.Add(Lattitude_Input.Text)
+	List1.Add(Longitude_Input.Text)
+	List1.Add(NS_Spin.SelectedIndex)
+	List1.Add(EW_Spin.SelectedIndex)
+	List1.Add(Interval_Spin.SelectedIndex)
+	List1.Add(Unit_Spin.SelectedIndex)
+	
+	
+	RP.CheckAndRequest(RP.PERMISSION_WRITE_EXTERNAL_STORAGE)
+	wait for Activity_PermissionResult( Permission As String, Results As Boolean)
+	If Results Then
+		File.WriteList(File.DirRootExternal,FileINI,List1)
+		ToastMessageShow ("Settings Saved", True)
+	Else
+	
+	End If
+
+End Sub
+
+
+
+
+
+
+
+
+
+Sub Admin_StateChanged (NewState As Int, OldState As Int)
+	'btnSearchForDevices.Enabled = (NewState = Admin.STATE_ON)
+	'btnAllowConnection.Enabled = btnSearchForDevices.Enabled
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+	If UserClosed = True Then
+		Serial1.Disconnect
+		PWS.ReleaseKeepAlive
+	End If
+End Sub
+
+Sub Search_Button_Click
+	If Connected = False Then
+		FoundDevices.Initialize
+		If Admin.StartDiscovery	= False Then 
+			ToastMessageShow("Error starting discovery process.", True)
+		Else
+			ProgressDialogShow("Searching for devices...")
+		End If
+	
+	End If
+	
+End Sub
+
+Sub Admin_DiscoveryFinished
+	ProgressDialogHide
+	If FoundDevices.Size = 0 Then
+		ToastMessageShow("No device found.", True)
+	Else
+		Dim l As List
+		l.Initialize
+		For i = 0 To FoundDevices.Size - 1
+			Dim nm As NameAndMac
+			nm = FoundDevices.Get(i)
+			l.Add(nm.Name)
+		Next
+		Dim res As Int
+		res = InputList(l, "Choose device to connect", -1)
+		If res <> DialogResponse.CANCEL Then
+			connectedDevice = FoundDevices.Get(res)
+			ProgressDialogShow("Trying to connect to: " & connectedDevice.Name & " (" & connectedDevice.Mac & ")")
+			Serial1.Connect(connectedDevice.Mac)
+			
+		End If
+	End If
+End Sub
+
+Sub Admin_DeviceFound (Name As String, MacAddress As String)
+	Log(Name & ":" & MacAddress)
+	Dim nm As NameAndMac
+	nm.Name = Name
+	nm.Mac = MacAddress
+	FoundDevices.Add(nm)
+	ProgressDialogShow("Searching for devices (~ device found)...".Replace("~", FoundDevices.Size))
+End Sub
+
+Sub Discover_Button_Click
+	If Connected = False Then
+		'this intent makes the device discoverable for 300 seconds.
+		Dim i As Intent
+		i.Initialize("android.bluetooth.adapter.action.REQUEST_DISCOVERABLE", "")
+		i.PutExtra("android.bluetooth.adapter.extra.DISCOVERABLE_DURATION", 300)
+		StartActivity(i)
+		Serial1.Listen
+	End If
+End Sub
+
+'Starts streaming text
+Sub Start_Click
+	
+	If Connected = True Then
+		PWS.KeepAlive(True)
+		Streaming = True
+		StartStream_snd.Play
+		Start.Enabled = False
+		Stop.Enabled = True
+		Enable_Items
+		
+		ToastMessageShow("Streaming Started", False)
+'//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		Lattitude = Lattitude_Input.Text
+
+		If NS_Spin.SelectedIndex =  1 Then
+			Lattitude = -Abs(Lattitude)
+		Else
+			NS_Spin.SelectedIndex = 0
+			Lattitude = Abs(Lattitude)
+		End If
+		
+		Longitude = Longitude_Input.Text
+
+		If EW_Spin.SelectedIndex = 1 Then
+			Longitude = -Abs(Longitude)
+		Else
+			EW_Spin.SelectedIndex = 0
+			Longitude = Abs(Longitude)
+		End If
+'//////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+		Reset_LatLong_Button.Enabled = False
+		Unit_Spin_Lbl.Color = 0xFF7F7F7F		:	Unit_Spin.Enabled = False
+		Interval_Spin_Lbl.Color = 0xFF7F7F7F	:	Interval_Spin.Enabled = False
+		Lattitude_Input_Lbl.Color = 0xFF7F7F7F	:	Lattitude_Input.Enabled = False
+		Longitude_Input_Lbl.Color = 0xFF7F7F7F	:	Longitude_Input.Enabled = False
+		NS_Spin_Lbl.Color = 0xFF7F7F7F			:	NS_Spin.Enabled = False
+		EW_Spin_Lbl.Color = 0xFF7F7F7F			:	EW_Spin.Enabled = False
+		
+	End If
+	
+End Sub
+
+'Stops streaming text
+Sub Stop_Click
+	
+If Connected = True Then
+	PWS.ReleaseKeepAlive
+	Streaming = False
+	StopStream_snd.Play
+	ToastMessageShow("Streaming Stopped", False)
+	Start.Enabled = True
+	Stop.Enabled = False
+	Disable_Items
+				
+	Reset_LatLong_Button.Enabled = True
+	Unit_Spin_Lbl.Color = 0xFFFFFFFF		:	Unit_Spin.Enabled = True
+	Interval_Spin_Lbl.Color = 0xFFFFFFFF	: 	Interval_Spin.Enabled = True
+	Lattitude_Input_Lbl.Color = 0xFFFFFFFF	: 	Lattitude_Input.Enabled = True
+	Longitude_Input_Lbl.Color = 0xFFFFFFFF	:	Longitude_Input.Enabled = True
+	NS_Spin_Lbl.Color = 0xFFFFFFFF			:	NS_Spin.Enabled = True
+	EW_Spin_Lbl.Color = 0xFFFFFFFF			:	EW_Spin.Enabled = True
+	
+End If
+	
+End Sub
+
+Sub Connect_Button_Click
+    If Serial1.IsEnabled = True Then
+		Status.Text = "Connecting..."
+		Dim PairedDevices As Map
+    	PairedDevices = Serial1.GetPairedDevices
+    	Dim l As List
+    	l.Initialize
+    	For i = 0 To PairedDevices.Size - 1
+       		l.Add(PairedDevices.GetKeyAt(i)) 'add the friendly name to the list
+    	Next
+    	Dim res As Int
+    	res = InputList(l, "Choose device", -1) 'show list with paired devices
+		If res <> DialogResponse.CANCEL Then
+        	Serial1.Connect(PairedDevices.Get(l.Get(res))) 'convert the name to mac address
+
+    	End If
+	End If
+End Sub
+
+Sub Disconnect_Button_Click
+	If Connected = True Then
+		Connected = False
+		Streaming = False
+		Serial1.Disconnect
+		ToastMessageShow("Disconnected", False)
+		Status.Text = "Waiting for incoming connection"
+		Start.Enabled = False
+		Stop.Enabled = False
+		Disable_Items
+		Disconnected_snd.Play
+	End If
+	
+End Sub
+
+
+Sub menuabout_click
+	Show_Info
+End Sub
+
+Sub Info_Button_click
+	Show_Info
+End Sub
+
+Sub Show_Info
+	Message = Message & app_label & CRLF
+	Message = Message & app_ver & CRLF & CRLF
+	Message = Message & app_author & CRLF
+	Message = Message & app_email & CRLF
+	Message = Message & app_website & CRLF & CRLF
+	Message = Message & "This application will generate the NMEA $GPRMC and $GPGGA sentences with the specified parameters. These can then be adjusted live while streaming." & CRLF
+	Result = Msgbox2(Message,"GPS NMEA Simulator","Done","","",bmp_mid)
+	Message = ""
+	If Result = DialogResponse.POSITIVE Then
+		' 
+	Else
+		Return True
+	End If
+End Sub
+
+
+
+Sub MenuExit_click
+	Exit_App
+End Sub
+
+Sub Exit_Button_Click
+	Exit_App
+End Sub
+
+Sub Exit_App
+	PWS.ReleaseKeepAlive
+	Streaming = False
+	Connected = False
+	Serial1.Disconnect
+	Disconnected_snd.Play
+	'Activity.Finish
+	ExitApplication
+End Sub
+
+Sub Serial1_Connected (Success As Boolean)
+	ProgressDialogHide
+	Log("connected: " & Success)
+	
+	If Success Then
+		Connected_snd.Play
+        Start.Enabled = True
+		ToastMessageShow("Connected successfully!", False)
+		Status.Text = "Connected"
+        TextWriter1.Initialize(Serial1.OutputStream)
+        Timer1.Enabled = True
+        Connected = True
+    Else
+   		Log(LastException.Message)
+		ToastMessageShow("Error connecting: " & LastException.Message, True)
+		Connected = False
+        Timer1.Enabled = False
+		Status.Text = "Waiting for incoming connection"
+    End If
+End Sub
+
+
+
+'500 Millisecond TX interval
+Sub Timer1_Tick
+	
+	If Connected = True And Streaming = True Then
+			Calc_NMEA
+			Transmit_Data
+    End If
+	
+End Sub
+
+Sub Timer2_tick
+	Timer2.Enabled = False
+	Indicator.Visible = False
+End Sub
+
+
+
+
+Sub NMEA_Checksum(NMEA As String)
+Dim stPos As Int, spPos As Int, a As Int, checksum As Int, charInt As Int
+
+a=0
+
+stPos = NMEA.LastIndexOf ("$")+1
+spPos = NMEA.LastIndexOf ("*")-1
+checksum=0 
+If stPos<>0 And spPos<>0 And spPos>stPos Then 
+    For a=stPos To spPos
+        charInt = Asc(NMEA.CharAt(a))
+        checksum = Bit.Xor(checksum,charInt)
+    Next
+    Return Bit.ToHexString(checksum).ToUpperCase
+Else
+    Return Null
+End If
+	
+End Sub
+'//////////////////////////////////////////////////////////////////////////////////////////////////////////
+Sub Calc_NMEA
+	
+	Status_update
+	
+	Dim GPS_String As String
+	'Dim NMEA_Lat_Temp As String
+	Dim Nav_dbl() As Double
+	
+	'Define NMEA output date/time
+	Dim time As String 
+	Dim Date As String
+	
+	Now = DateTime.Now
+	Date = DateTime.Date(Now).SubString2(0,6)
+	time = DateTime.Date(Now).SubString2(6,12) & ".000"
+	
+	If Imperial = True Then
+		NMEA_Speed = Speed * 0.868976242 'convert miles per hour to knots
+		Distance = (1.609344 * Speed) / Speed_Interval 'Timer = 500mS / 7200 second interval, so we convert given speed (mph to kph) in KPH to meters per second..
+	else if Imperial = False Then
+		NMEA_Speed = Speed * 0.539956803 'convert kilometermeters per second to Knots
+		Distance = Speed / Speed_Interval 'Timer = 500mS / 7200 second interval, so we convert given speed in KPH to meters per second..
+	End If
+	
+	If NMEA_Speed.Length > 6 Then NMEA_Speed = NMEA_Speed.SubString2(0,6)
+	
+	If Lattitude >= 0.00 Then
+		NS_Spin.SelectedIndex = 0
+		Lattitude_hems = "N"
+		Else If Lattitude <= -0.00 Then
+			NS_Spin.SelectedIndex = 1
+			Lattitude_hems = "S"
+	End If
+	
+	If Longitude >= 0.00 Then
+		EW_Spin.SelectedIndex = 0
+		Longitude_hems = "E"
+		Else If Longitude <= -0.00 Then
+			EW_Spin.SelectedIndex = 1
+			Longitude_hems = "W"
+	End If
+	
+	Nav_dbl = Nav.GeoNextPoint(Lattitude,Longitude,Distance,Bearing)
+		
+	
+	'Convert new calculated coordinates back to DMS from DEC
+	Lattitude = Nav_dbl(0)
+	Longitude = Nav_dbl(1)
+
+	'Update Input text boxes with new coordinates, and limit the string to maximum 8 characters
+	Lattitude_Input.Text = Abs(Lattitude)
+	If Lattitude_Input.Text.Length > 8 Then Lattitude_Input.Text = Lattitude_Input.Text.SubString2(0,8)
+	
+	Longitude_Input.Text = Abs(Longitude)
+	If Longitude_Input.Text.length > 8 Then Longitude_Input.text = Longitude_Input.Text.SubString2(0,8)
+
+	'Make NMEA lat/lon sentence ready for proper NMEA output
+	NMEA_Lat = DECtoDMS(Abs(Lattitude))
+	NMEA_Lon = DECtoDMS(Abs(Longitude))
+	
+	NMEA_Lat = NMEA_Lat & "00000"
+	NMEA_Lon = NMEA_Lon & "00000"
+
+	If DECtoDMS(Lattitude) < 10 Then
+		NMEA_Lat = "0" & NMEA_Lat.SubString2(0,1) & NMEA_Lat.SubString2(2,4) & "." & NMEA_Lat.SubString2(4,8) 
+		Else If DECtoDMS(Lattitude) > 10 Then
+			NMEA_Lat = NMEA_Lat.SubString2(0,2) & NMEA_Lat.SubString2(3,5) & "." & NMEA_Lat.SubString2(5,9)
+	End If
+		
+	If DECtoDMS(Longitude) < 10 Then
+		NMEA_Lon = "00" & NMEA_Lon.SubString2(0,1) & NMEA_Lon.SubString2(2,4) & "." & NMEA_Lon.SubString2(4,8) 
+		Else If DECtoDMS(Longitude) < 100 Then
+			NMEA_Lon = NMEA_Lon.SubString2(0,2) & NMEA_Lon.SubString2(3,5) & "." & NMEA_Lon.SubString2(5,9) 
+			Else If DECtoDMS(Longitude) > 100 Then
+				NMEA_Lon = NMEA_Lon.SubString2(0,3) & NMEA_Lon.SubString2(4,6) & "." & NMEA_Lon.SubString2(6,10)
+	End If
+	
+
+		
+	'Build up complete NMEA sentences
+	GPS_String = "$GPRMC,"
+	GPS_String = GPS_String & time & ",A,"
+	GPS_String = GPS_String & NMEA_Lat & "," & Lattitude_hems & ","
+	GPS_String = GPS_String & NMEA_Lon & "," & Longitude_hems & ","
+	GPS_String = GPS_String & NMEA_Speed &","& NMEA_Bearing & ".0," & Date & ",,*"
+	GPRMC = GPS_String & NMEA_Checksum(GPS_String)
+	
+	GPS_String = "$GPGGA,"
+	GPS_String = GPS_String & time & ","
+	GPS_String = GPS_String & NMEA_Lat & "," & Lattitude_hems & ","
+	GPS_String = GPS_String & NMEA_Lon & "," & Longitude_hems & ","
+	GPS_String = GPS_String & NMEA_SatFix & "," & NMEA_SatView & ",4.4,"& NMEA_Alt & ".0,M,48.0,M,,*"
+	GPGGA = GPS_String & NMEA_Checksum(GPS_String)
+	
+'	If NMEA_Output_Lines < 7 Then
+'		NMEAMon_Label.Text = NMEAMon_Label.Text & CRLF & (GPRMC & CRLF & " " & GPGGA)
+'		NMEA_Output_Lines = NMEA_Output_Lines + 1
+'	Else if NMEA_Output_Lines > 6 Then
+'		NMEA_Output_Lines = 0
+'		NMEAMon_Label.Text = ""
+'		NMEAMon_Label.Text = GPRMC & CRLF & " " & GPGGA
+'	End If
+	
+End Sub
+'//////////////////////////////////////////////////////////////////////////////////////////////////////////
+Sub Transmit_Data
+	
+	Timer1.Enabled = False			
+	TextWriter1.WriteLine(GPRMC) 'Fills the TX buffer
+	TextWriter1.Flush 'Spits out TX buffer over bluetooth
+	TextWriter1.WriteLine(GPGGA)
+	TextWriter1.Flush 'Spits out TX buffer over bluetooth
+	Timer1.Enabled = True
+	Indicator.Visible = True
+	Timer2.Enabled = True
+	
+End Sub
+
+'Converts Decimal coordinate to DD.MMMM coordinate
+Sub DECtoDMS (DEC As Float) As Float
+
+Dim Degrees As Int
+Dim Minutes As Double
+
+Degrees = (DEC)
+Minutes = ((DEC - Degrees) * 60) / 100
+
+	Return Degrees + Minutes
+
+End Sub
+
+
+''Converts DD.MMMM coordinate to Decimal coordinate
+'Sub DMStoDEC (DMS As Double)
+'
+'Dim Degrees As Int
+'Dim Minutes As Double
+'
+'Degrees = (DMS)
+'Minutes = ((DMS - Degrees) / 60) * 100
+'
+'	Return Degrees + Minutes
+'
+'End Sub
+
+'Updates Seekbars
+Sub Status_update
+
+	Dim Alt_Temp As Int
+	
+	Speed = Speed_Bar.Value
+	
+	NMEA_Bearing = Bearing
+
+	If Imperial = True Then
+		Alt_Temp = (Altitude / 3.2808399)
+	else if Imperial = False Then
+		Alt_Temp = Altitude
+	End If
+	
+	NMEA_Alt = Alt_Temp
+	
+	If Sattelite_Bar.Value < 10 Then
+		NMEA_SatView = "0" & Sattelite_Bar.Value
+	Else
+			NMEA_SatView = Sattelite_Bar.Value
+	End If
+	
+		
+	NMEA_SatFix = SatFix_Spin.SelectedIndex
+	If Imperial = False Then
+		Altitude_Input.Text = "Altitude: " & Altitude & " Meter"
+		Speed_Input.Text = "Speed: " & Speed & " Km/h"
+	Else If Imperial = True Then
+		Altitude_Input.Text = "Altitude: " & Altitude & " Feet"
+		Speed_Input.Text = "Speed: " & Speed & " mph"
+	End If
+	
+	
+	Bearing_Input.Text = "Bearing: " & Bearing & "°"
+	SatView_Input.Text = "Satellites in view: " & Sattelite_Bar.Value
+	WindDirection_Input.Text = "Wind direction: " & WindDirection_Bar.Value & "°"
+	
+End Sub
+
+
+
+Sub Interval_Spin_ItemClick (Position As Int, Value As Object)
+	Set_Interval
+End Sub
+
+
+Sub Set_Interval()
+	
+	If Interval_Spin.SelectedIndex = 0 Then
+			Warning_Message
+			Interval = 100
+			Speed_Interval = 36000
+		
+	Else If Interval_Spin.SelectedIndex = 1 Then
+				Warning_Message
+				Interval = 250
+				Speed_Interval = 14400
+			
+	Else If Interval_Spin.SelectedIndex = 2 Then
+					Warning_Message
+					Interval = 500
+					Speed_Interval = 7200
+					
+	Else If Interval_Spin.SelectedIndex = 3 Then
+						Warning_Message
+						Interval = 1000
+						Speed_Interval = 3600
+	End If
+
+	Timer1.Initialize("Timer1", Interval) '500ms second interval for serial output rate						
+						
+End Sub
+
+Sub Warning_Message
+	Message = Message & "Using this app in combination with a" & CRLF
+	Message = Message & "Bluetooth to Serial adapter," &  CRLF
+	Message = Message & "Low baudrates in conjunction with too" & CRLF
+	Message = Message & "fast update intervals can cause truncated"  & CRLF 
+	Message = Message & "message transmissions! or hangup of the progam." & CRLF & CRLF
+	Message = Message & "Guideline: 1200bps -> 1 Second interval" & CRLF
+	Message = Message & "4800bps -> 500mS interval"
+	
+	Msgbox2(Message,"Warning","Ok","","",bmp_warning)
+	Message = "" 
+
+End Sub
+
+Sub Reset_LatLong_Button_Click
+	
+	If Streaming = False Then
+		Lattitude_Input.Text = Default_Lattitude
+		Longitude_Input.Text = Default_Longitude
+		Reset_snd.Play
+	End If
+	
+End Sub
+
+
+
+Sub AltitudeInc_Button_Click
+	If Altitude_value < 25 Then
+		Altitude_value = Altitude_value + 1
+		If Imperial = False Then
+			Altitude_Text.Text = Altitude_value & " m/s"
+		Else If Imperial = True Then
+			Altitude_Text.Text = Altitude_value & " ft/s"
+		End If
+	End If
+End Sub
+
+Sub AltitudeDecr_Button_Click
+	If Altitude_value > -25 Then
+		Altitude_value = Altitude_value - 1
+		If Imperial = False Then
+			Altitude_Text.Text = Altitude_value & " m/s"
+		Else If Imperial = True Then
+			Altitude_Text.Text = Altitude_value & " ft/s"
+		End If
+	End If	
+End Sub
+
+Sub WindSpeedInc_Button_Click
+	If WindSpeed_Value < 250 Then
+		WindSpeed_Value = WindSpeed_Value + 5
+		If Imperial = False Then
+			WindSpeed_Text.Text = WindSpeed_Value & " Km/h"
+		Else If Imperial = True Then
+			WindSpeed_Text.Text = WindSpeed_Value & " mph"
+		End If
+	End If
+End Sub
+
+Sub WindSpeedDecr_Button_Click
+	If WindSpeed_Value > 0 Then
+		WindSpeed_Value = WindSpeed_Value - 5
+		If Imperial = False Then
+			WindSpeed_Text.Text = WindSpeed_Value & " Km/h"
+		Else If Imperial = True Then
+			WindSpeed_Text.Text = WindSpeed_Value & " mph"
+		End If
+	End If
+End Sub
+
+Sub CircleInc_Button_Click
+	If Circle_Value < 25 Then
+		Circle_Value = Circle_Value + 1
+		Circle_Text.Text = Circle_Value  & " °/s"
+	End If
+End Sub
+Sub CircleDecr_Button_Click
+	If Circle_Value > -25 Then
+		Circle_Value = Circle_Value - 1
+		Circle_Text.Text = Circle_Value & " °/s"
+	End If
+End Sub
+
+Sub Timer3_tick
+	Dim Bearing_temp As Double
+	Dim Altitude_temp As Int
+	
+	Bearing = Bearing_Bar.Value
+	Altitude = Altitude_Bar.Value	
+	
+	Bearing_temp = Bearing
+	Altitude_temp = Altitude
+	
+	If Circle_Check.checked = True	Then
+	
+		If Circle_Value < 0 Then
+		
+			Bearing_temp = Bearing_temp - Abs(Circle_Value)
+			
+				If Bearing_temp < 0 Then
+					Bearing_temp = 360 - Abs(Bearing_temp)
+
+					Bearing = Bearing_temp
+					Bearing_Bar.Value = Bearing
+				Else
+					Bearing = Bearing_temp
+					Bearing_Bar.Value = Bearing
+				End If
+		
+		Else If Circle_Value > 0 Then
+		
+			Bearing_temp = Bearing_temp + Circle_Value
+			
+				If Bearing_temp > 360 Then
+					Bearing_temp = Bearing_temp - 360
+					Bearing = Bearing_temp
+					Bearing_Bar.Value = Bearing
+				Else
+					Bearing = Bearing_temp
+					Bearing_Bar.Value = Bearing
+				End If
+		End If
+		
+	End If
+	
+	If Altitude_Check.Checked = True Then
+		
+		If Altitude_value < 0 Then
+			
+			If Altitude > 0 Then
+				Altitude_temp = Altitude_temp - Abs(Altitude_value)
+				Altitude = Altitude_temp
+				Altitude_Bar.Value = Altitude
+			Else
+				Altitude = 0
+			End If
+			
+			Else If Altitude_value > 0 Then
+			
+				If Altitude < 3000 Then
+					Altitude_temp = Altitude_temp + Altitude_value
+					Altitude = Altitude_temp
+					Altitude_Bar.Value = Altitude
+				Else
+					Altitude = 3000
+				End If
+		End If
+		
+	End If
+	
+	If Wind_Check.Checked = True Then
+		WindDirection_Bar.Enabled = True
+		Else
+			WindDirection_Bar.Enabled = False	
+	End If
+		
+
+End Sub
+
+Sub Enable_Items
+	Bearing_Bar.Enabled = True
+	Speed_Bar.Enabled = True
+	Altitude_Bar.Enabled = True
+	Sattelite_Bar.Enabled = True
+End Sub
+
+Sub Disable_Items
+'	Bearing_Bar.Enabled = False
+'	Speed_Bar.Enabled = False
+'	Altitude_Bar.Enabled = False
+'	Sattelite_Bar.Enabled = False
+'	WindDirection_Bar.Enabled = False
+End Sub
+Sub Bearing_Bar_ValueChanged (Value As Int, UserChanged As Boolean)
+	Bearing = Value
+	Status_update
+	
+End Sub
+Sub Speed_Bar_ValueChanged (Value As Int, UserChanged As Boolean)
+	Speed = Value
+	Status_update
+End Sub
+Sub Altitude_Bar_ValueChanged (Value As Int, UserChanged As Boolean)
+	Altitude = Value
+	Status_update
+End Sub
+Sub Sattelite_Bar_ValueChanged (Value As Int, UserChanged As Boolean)
+	Status_update
+End Sub
+Sub WindDirection_Bar_ValueChanged (Value As Int, UserChanged As Boolean)
+	Status_update
+End Sub
+
+
+Sub Unit_Update(Unit_Type As Boolean)
+	If Unit_Type = False Then
+		Imperial = False
+		Altitude_Text.Text = "0 m/s"
+		WindSpeed_Text.Text = "0 km/h"
+		Speed_Input.Text = "Speed: " & Speed & " km/h"
+		Altitude_Input.Text = "Altitude: " & Altitude & " Meter"
+	else if Unit_Type = True Then
+		Imperial = True
+		Altitude_Text.Text = "0 ft/s"
+		WindSpeed_Text.Text = "0 mph"
+		Speed_Input.Text = "Speed: " & Speed & " mph"
+		Altitude_Input.Text = "Altitude: " & Altitude & " feet"
+	End If
+	Circle_Text.Text = "0 °/s"
+End Sub
+
+
+Sub Unit_Spin_ItemClick (Position As Int, Value As Object)
+	If Position = 0 Then
+		Unit_Update(False)
+	Else If Position = 1 Then
+		Unit_Update(True)
+	End If
+End Sub
+
+
+
+Sub Save_Button_Click
+	SaveINI
+End Sub
